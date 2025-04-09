@@ -1,0 +1,7 @@
+aiogram
+selenium
+selenium-wire
+webdriver-manager
+fake-useragent
+blinker==1.7.0
+setuptools>=65.0.0
