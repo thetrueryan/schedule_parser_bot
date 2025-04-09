@@ -10,8 +10,10 @@ from selenium.common.exceptions import NoSuchElementException
 import json
 from dotenv import load_dotenv, find_dotenv
 import os
+import tempfile
+import shutil
 #================================================================
-
+profile_path = tempfile.mkdtemp()
 
 #Ссылки и глобальные переменные:
 url = "https://dnevnik.ru/"
@@ -127,6 +129,7 @@ def main():
     # Инициализация драйвера при каждом запуске
     options = Options()
     options.add_argument(f"user-agent={UserAgent().random}")
+    options.add_argument(f"--user-data-dir={profile_path}")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--headless=new")
     driver = webdriver.Chrome(
@@ -153,7 +156,7 @@ if __name__ == "__main__":
     finally:
         if driver:
             driver.quit()
-
+            shutil.rmtree(profile_path, ignore_errors=True)
 
 
 
