@@ -131,7 +131,7 @@ async def main():
         send_daily,
         trigger="cron",
         hour=10,
-        minute=0,  # Через 1 минуту
+        minute=0, 
         day="*"
     )
     scheduler.start()

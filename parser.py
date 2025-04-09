@@ -8,7 +8,6 @@ import time
 from fake_useragent import UserAgent
 from selenium.common.exceptions import NoSuchElementException
 import json
-import schedule
 from dotenv import load_dotenv, find_dotenv
 import os
 #================================================================
@@ -27,13 +26,19 @@ load_dotenv(find_dotenv())
 
 #Вход в dnevnik.ru:
 def dnevnik_login():
-    driver.get(url)
-    driver.find_element(by=By.XPATH, value='//*[@id="anon-buttons"]/div[1]/a').click()
-    driver.find_element(by=By.XPATH, value='/html/body/div/div/div/div/div/form/div[2]/div[3]/div[1]/div[1]/label/input').send_keys(os.getenv('LOGIN'))
-    driver.find_element(by=By.XPATH, value='//*[@id="password-field"]').send_keys(os.getenv('PASSWD'))
-    driver.find_element(by=By.XPATH, value='/html/body/div/div/div/div/div/form/div[2]/div[3]/div[4]/div[1]/input').click()
-    driver.find_element(by=By.XPATH, value='/html/body/div[2]/div/div[2]/ul/li[2]/ul/li[4]/a').click()  
-    time.sleep(2)
+    try:
+        driver.get(url)
+        try:
+            driver.find_element(by=By.XPATH, value='//*[@id="anon-buttons"]/div[1]/a').click()
+            driver.find_element(by=By.XPATH, value='/html/body/div/div/div/div/div/form/div[2]/div[3]/div[1]/div[1]/label/input').send_keys(os.getenv('LOGIN'))
+            driver.find_element(by=By.XPATH, value='//*[@id="password-field"]').send_keys(os.getenv('PASSWD'))
+            driver.find_element(by=By.XPATH, value='/html/body/div/div/div/div/div/form/div[2]/div[3]/div[4]/div[1]/input').click()
+            driver.find_element(by=By.XPATH, value='/html/body/div[2]/div/div[2]/ul/li[2]/ul/li[4]/a').click()  
+        except Exception as e:
+            print(f"Ошибка, элемент не найден или отсутствует: {e}")
+        time.sleep(2)
+    except Exception as e:
+        print(f"Ошибка загрузки страницы: {e}")    
 #================================================================
 
 
@@ -140,8 +145,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-    driver.quit()
+    try:
+        main()
+        print(f"Скрипт начался: {datetime.now()}")
+    except Exception as e:
+        print(f"[Ошибка во время работы скрипта]: {e}")
+    finally:
+        if driver:
+            driver.quit()
 
 
 
