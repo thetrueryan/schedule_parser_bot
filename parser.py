@@ -10,10 +10,8 @@ from selenium.common.exceptions import NoSuchElementException
 import json
 from dotenv import load_dotenv, find_dotenv
 import os
-import tempfile
-import shutil
 #================================================================
-profile_path = tempfile.mkdtemp()
+
 
 #Ссылки и глобальные переменные:
 url = "https://dnevnik.ru/"
@@ -24,6 +22,15 @@ load_dotenv(find_dotenv())
 
 
 
+options = Options()
+options.add_argument(f"user-agent={UserAgent().random}")
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--headless=new")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+driver = webdriver.Chrome(
+        options=options,
+    )
 
 
 #Вход в dnevnik.ru:
@@ -126,16 +133,6 @@ def schedule_save():
 #Главная функция
 def main():
     global driver, schedule
-    # Инициализация драйвера при каждом запуске
-    options = Options()
-    options.add_argument(f"user-agent={UserAgent().random}")
-    options.add_argument(f"--user-data-dir={profile_path}")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--headless=new")
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-        options=options,
-    )
 
     day_ids = get_day_ids()
     schedule = {day_id: [] for day_id in day_ids}  
@@ -153,10 +150,7 @@ if __name__ == "__main__":
         print(f"Скрипт начался: {datetime.now()}")
     except Exception as e:
         print(f"[Ошибка во время работы скрипта]: {e}")
-    finally:
-        if driver:
-            driver.quit()
-            shutil.rmtree(profile_path, ignore_errors=True)
+    driver.quit()
 
 
 
