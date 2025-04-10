@@ -13,3 +13,6 @@ __pycache__/
 # IDE-шные файлы (если используешь VS Code, PyCharm и т.п.)
 *.vscode/
 *.idea/
+
+#Chrome driver
+chromedriver.exe
