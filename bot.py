@@ -5,18 +5,19 @@ import asyncio
 import json
 from datetime import timedelta, datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 import os
 from dotenv import load_dotenv, find_dotenv
+from parser import run_parser
 #============================================================================
 
-load_dotenv(find_dotenv())
 
 #Инициализация бота
+load_dotenv(find_dotenv())
 bot = Bot(token=os.getenv('BOT_TOKEN'))
 dp = Dispatcher()
-GROUP_ID = -1002633208903
+GROUPS_FILE = "./groups.json"
 #============================================================================
-
 
 
 #Команда /START
@@ -40,7 +41,6 @@ async def start_cmd(message: types.Message):
     )
     await message.answer(start_text, parse_mode="HTML")
 #============================================================================
-
 
 
 #Команда /расписание
@@ -97,13 +97,16 @@ async def send_daily():
 
         with open("./schedule.json", "r", encoding="utf-8") as f:
             schedule = json.load(f)
+        with open(GROUPS_FILE, "r", encoding="utf-8") as f:
+            groups = json.load(f)
+
 
         if date_key not in schedule:
             response = f"📅 Расписание на {next_day}:\n\nРасписание не найдено"
         elif not schedule[date_key]:
             response = f"📅 Расписание на {next_day}:\n <blockquote><b>#1\n 🤩 ВЫХОДНОЙ </b></blockquote>"
         else:
-            response = f"<b>📅 Авто-отправка расписания на {next_day}:</b>\n\n"
+            response = f"<b><u>📅 Авто-отправка расписания на {next_day}:</u></b>\n\n"
             for idx, lesson in enumerate(schedule[date_key], start=1):
                 response += (
                     "<blockquote>"
@@ -114,30 +117,62 @@ async def send_daily():
                     f"<b>🏫 Аудитория:</b> {lesson['room']}\n\n"
                     "</blockquote>"
                 )      
-        await bot.send_message(
-            chat_id=GROUP_ID,
-            text=response,
-            parse_mode="HTML"
-            )
+        for group_id in groups:
+            try:
+                await bot.send_message(
+                    chat_id=group_id,
+                    text=response,
+                    parse_mode="HTML"
+                )
+            except Exception as e:
+                print(f"Ошибка при отправке в {group_id}: {e}")
     except Exception as e:
         print(f"ошибка: {e}")
+#============================================================================
+
+
+#Функция загрузки/добавления чатов для рассылки
+def save_id(chat_id: int):
+    try:
+        with open(GROUPS_FILE, "r", encoding="utf-8") as f:
+            groups = json.load(f)
+    except:
+        groups = []
+    
+    if chat_id not in groups:
+        groups.append(chat_id)
+        with open(GROUPS_FILE, "w", encoding="utf-8") as f:
+            json.dump(groups, f, indent=2)
+        return True
+    return False
+#============================================================================
+
+
+#Комманда добавления чата в файл для рассылки
+@dp.message(Command("Добавить"))
+@dp.message(F.text.lower().startswith("Добавить "))
+async def add_chat_id(message: types.Message):
+    if save_id(message.chat.id):
+        await message.reply("✅Чат успешно добавлен в рассылки!")
+    else:
+        await message.reply("ℹ️ Группа уже есть в списке!")
 #============================================================================
 
 
 #Главная функция
 async def main():
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
-    scheduler.add_job(
-        send_daily,
-        trigger="cron",
-        hour=10,
-        minute=0, 
-        day="*"
-    )
+   # Задания на регулярный парсинг (00:00, 06:00, 12:00, 18:00, 00:00)
+    scheduler.add_job(run_parser, CronTrigger(hour='0,6,12,18', minute=0))
+
+    # Парсинг перед автоотправкой в 10:00
+    scheduler.add_job(run_parser, CronTrigger(hour=9, minute=55))
+
+    # Отправка расписания в 10:00
+    scheduler.add_job(send_daily, CronTrigger(hour=10, minute=0))
     scheduler.start()
     await dp.start_polling(bot)
 #============================================================================
-
 
 
 if __name__ == "__main__":
