@@ -149,8 +149,8 @@ def save_id(chat_id: int):
 
 
 #Комманда добавления чата в файл для рассылки
-@dp.message(Command("Добавить"))
-@dp.message(F.text.lower().startswith("Добавить "))
+@dp.message(Command("добавить"))
+@dp.message(F.text.lower().startswith("добавить "))
 async def add_chat_id(message: types.Message):
     if save_id(message.chat.id):
         await message.reply("✅Чат успешно добавлен в рассылки!")

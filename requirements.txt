@@ -7,4 +7,3 @@ blinker==1.7.0
 setuptools>=65.0.0
 python-dotenv
 apscheduler
-pickle

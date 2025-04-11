@@ -8,21 +8,18 @@ from selenium.common.exceptions import NoSuchElementException
 import json
 from dotenv import load_dotenv, find_dotenv
 import os
-import pickle
 #================================================================
 
 
 #Ссылки и глобальные переменные:
 url = "https://dnevnik.ru/"
-cookies_url = "https://schools.dnevnik.ru/v2/schedules/view?school=42991&group=2257077130866233197"
 day_ids = []
 schedule = {}
-cookies_path = "./cookies.dat"
 load_dotenv(find_dotenv())
 #================================================================
 
 
-
+#Формируем driver и options
 options = Options()
 options.add_argument(f"user-agent={UserAgent().random}")
 options.add_argument("--disable-blink-features=AutomationControlled")
@@ -32,10 +29,11 @@ options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(
         options=options,
     )
+#================================================================
 
 
 #Вход в dnevnik.ru:
-def nocookie_login():
+def login():
     try:
         driver.get(url)
         try:
@@ -43,10 +41,6 @@ def nocookie_login():
             driver.find_element(by=By.XPATH, value='/html/body/div/div/div/div/div/form/div[2]/div[3]/div[1]/div[1]/label/input').send_keys(os.getenv('LOGIN'))
             driver.find_element(by=By.XPATH, value='//*[@id="password-field"]').send_keys(os.getenv('PASSWD'))
             driver.find_element(by=By.XPATH, value='/html/body/div/div/div/div/div/form/div[2]/div[3]/div[4]/div[1]/input').click()
-            with open(cookies_path, "wb") as f:
-                pickle.dump(driver.get_cookies(), f) #Сохраняем куки, тк вошли без них
-            print("куки файлы сохранены в файл cookies.dat..")
-            time.sleep(2)
             driver.find_element(by=By.XPATH, value='/html/body/div[2]/div/div[2]/ul/li[2]/ul/li[4]/a').click()  
         except Exception as e:
             print(f"Ошибка, элемент не найден или отсутствует: {e}")
@@ -54,20 +48,6 @@ def nocookie_login():
     except Exception as e:
         print(f"Ошибка загрузки страницы: {e}")    
 #================================================================
-
-
-#Вход по cookie:
-def cookie_login():
-    driver.get(url)
-    with open(cookies_path, "rb") as f: #Читаем куки из файла
-        for cookie in pickle.load(f):
-            driver.add_cookie(cookie)
-    time.sleep(2)
-    driver.refresh()
-    time.sleep(2)
-    driver.get(cookies_url)
-
-
 
 
 #Формируем список с актуальными датами
@@ -152,30 +132,19 @@ def schedule_save():
 #Главная функция
 def run_parser():
     global driver, schedule
-    try:    #пытаемся запустить скрипт
+    try:
         day_ids = get_day_ids()
         schedule = {day_id: [] for day_id in day_ids}
-        try:  #пытаемся войти по куки
-            print("Пытаемся войти по cookie..")
-            cookie_login()
-            for day_id in day_ids:
-                parse_day_with_click(day_id)
-            print("Парсинг расписания прошел успешно, вход был выполнен по cookie")
-        except Exception as e:  #Если вход по кукам не удался
-            print(f"Во время входа по cookie возникла ошибка {e}. Пытаемся выполнить вход без cookie..")
-            time.sleep(2)
-            nocookie_login()
-            for day_id in day_ids:
-                parse_day_with_click(day_id)
-            print("Парсинг расписания прошел успешно, вход был выполнен без cookie")
-        schedule_save() #в конце сохраняем расписание
+        login()
+        for day_id in day_ids:
+            parse_day_with_click(day_id)
+        schedule_save()
 
-    except Exception as e: #Если не удался вход и по кукам и без
+    except Exception as e:
         print(f"[Ошибка во время работы скрипта]: {e}")
-    finally:    #В конце в любом случае выключаем driver
+    finally:
         if driver:
-            driver.quit()    
+            driver.quit()
 #================================================================
-
 
 
