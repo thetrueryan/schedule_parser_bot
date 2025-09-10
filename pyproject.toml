@@ -18,6 +18,9 @@ setuptools = ">=65.0.0"
 apscheduler = "^3.11.0"
 webdriver-manager = "^4.0.2"
 black = "^25.1.0"
+pydantic-settings = "^2.10.1"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.43"}
+alembic = "^1.16.5"
 
 
 [build-system]

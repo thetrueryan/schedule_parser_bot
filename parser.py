@@ -67,7 +67,7 @@ def login():
 
 
 # Формируем список с актуальными датами
-def get_day_ids(days_ahead=28):
+def get_day_ids(days_ahead=14):
     today = datetime.today()
     for i in range(days_ahead):
         day = today + timedelta(days=i)
