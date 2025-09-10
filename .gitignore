@@ -1,17 +1,59 @@
 # Игнорировать файлы с конфиденциальной информацией
-.env
 schedule.json
 groups.json
 
-# Виртуальное окружение
-venv/
-
-# Кеш Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
+*$py.class
 
-# IDE-шные файлы (если используешь VS Code, PyCharm и т.п.)
-*.vscode/
-*.idea/
+# Virtual environment
+.venv
+venv/
+.env/
+.env
+.test.env
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# SQLite
+*.db
+
+# Logs
+*.log
+
+# macOS / Linux / Windows junk
+.DS_Store
+Thumbs.db
+
+# Python dependency files
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# Backup or temp files
+*.bak
+*.tmp
+*.swp
+
+#env
+.env
+.environment
 
 #Chrome driver
 chromedriver.exe
