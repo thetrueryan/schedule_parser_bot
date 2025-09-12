@@ -8,5 +8,5 @@ async def get_session():
 
 
 async def get_schedule_repo() -> ScheduleRepository:
-    session = await get_session()
-    return ScheduleRepository(session=session)
+    async with async_session_factory() as session:
+        return ScheduleRepository(session=session)

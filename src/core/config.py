@@ -1,7 +1,6 @@
 import logging
 from logging import Logger
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -10,9 +9,8 @@ from selenium.webdriver.chrome.options import Options
 from seleniumwire import webdriver
 from fake_useragent import UserAgent
 
-from src.core.settings import settings
+from src.core.settings import settings, BASE_PATH
 
-BASE_PATH = Path(__file__).resolve().parent.parent.parent
 
 logger_path = BASE_PATH / "logs" / "app_logs.log"
 logger_path.parent.mkdir(parents=True, exist_ok=True)

@@ -58,7 +58,10 @@ class ParserService:
                     )
                     para = para_element.text.strip()
                     if para:
-                        schedule_on_this_date[date].append(para)
+                        if date not in schedule_on_this_date:
+                            schedule_on_this_date.update({date: []})
+                        else:
+                            schedule_on_this_date[date].append(para)
                 return schedule_on_this_date
             except NoSuchElementException:
                 logger.warning(f"day {date} not found, trying search on next week..")
