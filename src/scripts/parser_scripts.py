@@ -11,3 +11,4 @@ async def start_parser_loop(parser: ParserService):
         for date in dates:
             schedule_on_date = parser.parse_day_with_click(date)
             schedule.update(schedule_on_date)
+        shedule_list = parser.to_clear_schedule_list(schedule=schedule)

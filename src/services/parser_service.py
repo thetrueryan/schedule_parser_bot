@@ -67,3 +67,32 @@ class ParserService:
                 except Exception as e:
                     logger.error(f"Error while switching week: {e}")
                     break
+    
+    def to_clear_schedule_list(self, schedule: dict) -> list:
+        clear_schedule = []
+        for date, lessons in schedule.items():
+            for lesson in lessons:
+                parts = [part.strip() for part in lesson.split("\n")]
+                if len(parts) == 4:
+                    clear_schedule.append(
+                        {
+                            "date": date,
+                            "subject": parts[0],
+                            "teacher": parts[1],
+                            "time": parts[2],
+                            "room": parts[3],
+                        }
+                    )
+                elif len(parts) == 8:
+                    clear_schedule.append(
+                        {
+                            "date": date,
+                            "subject": parts[4],
+                            "teacher": parts[1] + ", " + parts[5],
+                            "time": parts[2],
+                            "room": parts[3] + ", " + parts[-1],
+                        }
+                    )
+                else:
+                    clear_schedule.append({"raw": lesson})
+        return clear_schedule

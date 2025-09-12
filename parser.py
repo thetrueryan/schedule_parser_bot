@@ -111,14 +111,14 @@ def parse_day_with_click(day_id):
 
 # Формируем итоговый словарь для записи:
 def schedule_save():
-    cleaned_schedule = {}
+    cleaned_schedule = []
     for date, lessons in schedule.items():
-        cleaned_lessons = []
         for lesson in lessons:
             parts = [part.strip() for part in lesson.split("\n")]
             if len(parts) == 4:
-                cleaned_lessons.append(
+                cleaned_schedule.append(
                     {
+                        "date": date,
                         "subject": parts[0],
                         "teacher": parts[1],
                         "time": parts[2],
@@ -126,8 +126,9 @@ def schedule_save():
                     }
                 )
             elif len(parts) == 8:
-                cleaned_lessons.append(
+                cleaned_schedule.append(
                     {
+                        "date": date,
                         "subject": parts[4],
                         "teacher": parts[1] + ", " + parts[5],
                         "time": parts[2],
@@ -135,9 +136,8 @@ def schedule_save():
                     }
                 )
             else:
-                cleaned_lessons.append({"raw": lesson})
+                cleaned_schedule.append({"raw": lesson})
 
-        cleaned_schedule[date] = cleaned_lessons
     with open("./schedule.json", "w", encoding="utf-8") as f:
         json.dump(cleaned_schedule, f, ensure_ascii=False, indent=4)
     print("Расписание сохранено в словарь.")
