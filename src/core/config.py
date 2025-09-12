@@ -39,10 +39,13 @@ def setup_logger(lvl: int = logging.INFO) -> Logger:
 
 
 def setup_bot() -> Bot:
-    return Bot(
-        token=settings.BOT_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-    )
+    if settings.BOT_TOKEN:
+        return Bot(
+            token=settings.BOT_TOKEN,
+            default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+        )
+    else:
+        raise ValueError("Bot token is None!")
 
 
 def setup_driver() -> webdriver.Chrome:

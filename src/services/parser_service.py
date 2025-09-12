@@ -43,10 +43,13 @@ class ParserService:
             raise
 
     def parse_day_with_click(
-        self, date: datetime, max_att: int = 3, max_lessons: int = 6
+        self,
+        date: datetime,
+        max_att: int = 3,
+        max_lessons: int = 6,
+        schedule_on_this_date: dict = {},
     ):
         attempts = 0
-        schedule_on_this_date = {}
         while attempts < max_att:
             try:
                 for i in range(1, max_lessons):

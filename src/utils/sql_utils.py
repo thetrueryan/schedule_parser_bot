@@ -1,5 +1,5 @@
-from core.session import async_session_factory
-from repository.schedule_repository import ScheduleRepository
+from src.core.session import async_session_factory
+from src.repository.schedule_repository import ScheduleRepository
 
 
 async def get_session():

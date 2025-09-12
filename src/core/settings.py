@@ -5,19 +5,19 @@ from src.core.config import BASE_PATH
 
 class Settings(BaseSettings):
     # bot
-    BOT_TOKEN: str
+    BOT_TOKEN: str | None = None
 
     # parser
-    DNEVNIK_URL: str
-    DNEVNIK_LOGIN: str
-    DNEVNIK_PASS: str
+    DNEVNIK_URL: str | None = None
+    DNEVNIK_LOGIN: str | None = None
+    DNEVNIK_PASS: str | None = None
 
     # db
-    DB_HOST: str
-    DB_PASS: str
-    DB_USER: str
-    DB_NAME: str
-    DB_PORT: int
+    DB_HOST: str | None = None
+    DB_PASS: str | None = None
+    DB_USER: str | None = None
+    DB_NAME: str | None = None
+    DB_PORT: int | None = None
 
     @property
     def DB_URL_ASYNC(self):
