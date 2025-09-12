@@ -1,6 +1,9 @@
+from typing import Annotated
+from datetime import datetime
+
+from sqlalchemy import text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from typing import Annotated
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
@@ -16,8 +19,9 @@ class ScheduleOrm(Base):
     __tablename__ = "schedule"
 
     id: Mapped[intpk]
-    day: Mapped[str] = mapped_column(nullable=True)
-    hours: Mapped[str] = mapped_column(nullable=True)
-    lesson: Mapped[str] = mapped_column(nullable=True)
-    teacher: Mapped[str] = mapped_column(nullable=True)
+    date: Mapped[str]
+    subject: Mapped[str]
+    teacher: Mapped[str]
+    time: Mapped[str]
+    room: Mapped[str]
     created_at: Mapped[created_at]

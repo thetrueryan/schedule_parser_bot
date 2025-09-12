@@ -4,6 +4,7 @@ from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
+from src.repository.schedule_repository import ScheduleRepository
 from src.core.config import driver, logger
 from src.core.settings import settings
 
@@ -42,8 +43,8 @@ class ParserService:
             raise
 
     def parse_day_with_click(
-            self, date: datetime, max_att: int = 3, max_lessons: int = 6
-            ):
+        self, date: datetime, max_att: int = 3, max_lessons: int = 6
+    ):
         attempts = 0
         schedule_on_this_date = {}
         while attempts < max_att:
@@ -67,7 +68,7 @@ class ParserService:
                 except Exception as e:
                     logger.error(f"Error while switching week: {e}")
                     break
-    
+
     def to_clear_schedule_list(self, schedule: dict) -> list:
         clear_schedule = []
         for date, lessons in schedule.items():
@@ -94,5 +95,13 @@ class ParserService:
                         }
                     )
                 else:
-                    clear_schedule.append({"raw": lesson})
+                    continue
         return clear_schedule
+
+    async def update_schedule_in_db(
+        self, schedule: list[dict], repo: ScheduleRepository
+    ) -> None:
+        status = await repo.add_schedule(schedule)
+        if not status:
+            logger.warning(f"schedule dont added in db: {schedule}")
+        return None
