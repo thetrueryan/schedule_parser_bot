@@ -1,7 +1,8 @@
 import asyncio
 
 from src.tasks.parser_tasks import start_parser_loop
-from src.core.config import bot, dp, logger
+from src.core.config import bot, dp
+from src.core.logger import logger
 
 
 async def main():

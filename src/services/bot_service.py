@@ -3,7 +3,6 @@ from datetime import datetime
 from src.repository.schedule_repository import ScheduleRepository
 from src.core.exc import DateValidateException
 from src.utils.bot_utils import fill_lessons_on_bot_response
-from src.core.config import logger
 
 
 class BotService:
@@ -16,10 +15,11 @@ class BotService:
             raise DateValidateException
 
         date = parts[1]
-        if len(date) != 10:
+        try:
+            datetime.strptime(date, "%d.%m.%Y")
+            return date
+        except ValueError:
             raise DateValidateException
-
-        return date
 
     async def get_schedule(self, date: str) -> list | None:
         format_date = date[6:10] + date[3:5] + date[0:2]
@@ -32,5 +32,6 @@ class BotService:
         if not schedule:
             response += "<blockquote><b>#1\n 🤩 ВЫХОДНОЙ </b></blockquote>"
             return response
+        print(response)
         response = fill_lessons_on_bot_response(response=response, schedule=schedule)
         return response

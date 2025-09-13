@@ -1,6 +1,6 @@
 import asyncio
 
-from src.core.config import logger
+from src.core.logger import logger
 from src.services.parser_service import ParserService
 from src.utils.parser_utils import get_day_ids
 from src.utils.sql_utils import get_schedule_repo

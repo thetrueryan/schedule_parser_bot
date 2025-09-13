@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from src.services.bot_service import BotService
 from src.core.exc import DateValidateException
-from src.core.config import logger
+from src.core.logger import logger
 
 router = Router(name="base_router")
 
@@ -16,7 +16,6 @@ async def get_schedule(message: Message, service: BotService):
         date = await service.get_date_from_message(message)
         schedule = await service.get_schedule(date)
         response = await service.create_schedule_response(schedule=schedule, date=date)
-
         await message.answer(response)
     except DateValidateException:
         await message.answer(

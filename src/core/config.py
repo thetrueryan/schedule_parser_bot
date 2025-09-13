@@ -1,7 +1,3 @@
-import logging
-from logging import Logger
-from logging.handlers import RotatingFileHandler
-
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -9,33 +5,10 @@ from selenium.webdriver.chrome.options import Options
 from seleniumwire import webdriver
 from fake_useragent import UserAgent
 
-from src.core.settings import settings, BASE_PATH
+from src.core.settings import settings
 from src.handlers.basic_handlers import router as basic_router
 from src.handlers.start_handlers import router as start_router
 from src.core.middlewares import BotMiddleware
-
-logger_path = BASE_PATH / "logs" / "app_logs.log"
-logger_path.parent.mkdir(parents=True, exist_ok=True)
-
-
-def setup_logger(lvl: int = logging.INFO) -> Logger:
-    logger = logging.getLogger(__name__)
-    logger.setLevel(level=lvl)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
-    )
-
-    file_handler = RotatingFileHandler(
-        logger_path, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8"
-    )
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    return logger
 
 
 def setup_bot() -> Bot:
@@ -68,8 +41,6 @@ def setup_dispatcher() -> Dispatcher:
     dp.include_router(basic_router)
     return dp
 
-
-logger = setup_logger()
 
 bot = setup_bot()
 dp = setup_dispatcher()

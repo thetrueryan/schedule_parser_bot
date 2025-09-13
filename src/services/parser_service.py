@@ -5,7 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
 from src.repository.schedule_repository import ScheduleRepository
-from src.core.config import driver, logger
+from src.core.config import driver
+from src.core.logger import logger
 from src.core.settings import settings
 
 
@@ -60,7 +61,7 @@ class ParserService:
                     para = para_element.text.strip()
                     if para:
                         if date not in schedule_on_this_date:
-                            schedule_on_this_date.update({date: []})
+                            schedule_on_this_date.update({date: [para]})
                         else:
                             schedule_on_this_date[date].append(para)
                 return schedule_on_this_date
