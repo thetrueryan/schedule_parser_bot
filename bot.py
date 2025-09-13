@@ -8,7 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import os
 from dotenv import load_dotenv, find_dotenv
-from parser import run_parser
+from parser import run_parser  # type:ignore
 
 # ============================================================================
 

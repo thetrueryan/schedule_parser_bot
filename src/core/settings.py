@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     DB_NAME: str | None = None
     DB_PORT: int | None = None
 
+    # customization
+    GROUP_NAME: str | None = ""
+    WEEKS_TOTAL: int | None = 4
+
     @property
     def DB_URL_ASYNC(self):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"

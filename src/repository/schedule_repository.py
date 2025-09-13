@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
 from src.models.sqlmodels import ScheduleOrm
 from src.core.config import logger
@@ -18,3 +18,8 @@ class ScheduleRepository:
         except Exception as e:
             logger.error(f"Error while add schedule in db: {e}")
             return False
+
+    async def get_schedule_by_date(self, date: str) -> list:
+        stmt = select(ScheduleOrm).where(ScheduleOrm.date == date)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

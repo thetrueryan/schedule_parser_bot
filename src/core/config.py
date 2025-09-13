@@ -10,7 +10,9 @@ from seleniumwire import webdriver
 from fake_useragent import UserAgent
 
 from src.core.settings import settings, BASE_PATH
-
+from src.handlers.basic_handlers import router as basic_router
+from src.handlers.start_handlers import router as start_router
+from src.core.middlewares import BotMiddleware
 
 logger_path = BASE_PATH / "logs" / "app_logs.log"
 logger_path.parent.mkdir(parents=True, exist_ok=True)
@@ -59,9 +61,17 @@ def setup_driver() -> webdriver.Chrome:
     )
 
 
+def setup_dispatcher() -> Dispatcher:
+    dp = Dispatcher()
+    dp.update.middleware(BotMiddleware())
+    dp.include_router(start_router)
+    dp.include_router(basic_router)
+    return dp
+
+
 logger = setup_logger()
 
 bot = setup_bot()
-dp = Dispatcher()
+dp = setup_dispatcher()
 
 driver = setup_driver()

@@ -10,8 +10,9 @@ from src.core.settings import settings
 
 
 class ParserService:
-    def __init__(self, driver: webdriver.Chrome = driver):
+    def __init__(self, repo: ScheduleRepository, driver: webdriver.Chrome = driver):
         self.driver = driver
+        self.repo = repo
 
     def login(self) -> None:
         try:
@@ -104,10 +105,8 @@ class ParserService:
                     continue
         return clear_schedule
 
-    async def update_schedule_in_db(
-        self, schedule: list[dict], repo: ScheduleRepository
-    ) -> None:
-        status = await repo.add_schedule(schedule)
+    async def update_schedule_in_db(self, schedule: list[dict]) -> None:
+        status = await self.repo.add_schedule(schedule)
         if not status:
             logger.warning(f"schedule dont added in db: {schedule}")
         return None

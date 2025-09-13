@@ -1,13 +1,11 @@
 import asyncio
 
-from src.scripts.parser_scripts import start_parser_loop
-from src.services.parser_service import ParserService
+from src.tasks.parser_tasks import start_parser_loop
 from src.core.config import bot, dp, logger
 
 
 async def main():
-    parser = ParserService()
-    await start_parser_loop(parser)
+    asyncio.create_task(start_parser_loop())
     await dp.start_polling(bot)
 
 
