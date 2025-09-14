@@ -5,6 +5,7 @@ from aiogram.types import Message
 from src.services.bot_service import BotService
 from src.core.exc import DateValidateException
 from src.core.logger import logger
+from src.core.settings import settings
 
 router = Router(name="base_router")
 
@@ -23,4 +24,40 @@ async def get_schedule(message: Message, service: BotService):
         )
     except Exception as e:
         logger.error(f"Error while user get schedule: {e}")
-        await message.answer("<b>⚠️Ошибка при получении расписания!</b>")
+        await message.answer("⚠️Ошибка при получении расписания!")
+
+
+@router.message(Command("добавить"))
+async def add_chat_id(message: Message, service: BotService):
+    try:
+        chat_id = message.from_user.id
+        status = await service.set_notification_status_in_chat(
+            chat_id=chat_id, status=True
+        )
+        if not status:
+            raise
+        await message.answer(
+            f"✅Чат успешно добавлен в ежедневную рассылку в {settings.NOTIFICATION_TIME}:00!"
+        )
+        logger.info(f"Chat with id: {chat_id} subscribe to notifications successfully")
+    except Exception as e:
+        logger.error(f"Error while add chat: {chat_id} to notification system: {e}")
+        await message.answer("⚠️Ошибка при добавлении чата в ежедневную рассылку!")
+
+
+@router.message(Command("удалить"))
+async def add_chat_id(message: Message, service: BotService):
+    try:
+        chat_id = message.from_user.id
+        status = await service.set_notification_status_in_chat(
+            chat_id=chat_id, status=False
+        )
+        if not status:
+            raise
+        await message.answer(
+            f"✅Чат успешно удален из ежедневной рассылки в {settings.NOTIFICATION_TIME}:00!"
+        )
+        logger.info(f"Chat with id: {chat_id} subscribe to notifications successfully")
+    except Exception as e:
+        logger.error(f"Error while add chat: {chat_id} to notification system: {e}")
+        await message.answer("⚠️Ошибка при удалении чата из ежедневной рассылки!")

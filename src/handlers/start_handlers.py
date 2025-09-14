@@ -1,30 +1,20 @@
-from datetime import datetime, timedelta
-
 from aiogram import Router
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import Command
 from aiogram.types import Message
 
-from src.core.settings import settings
+from src.services.bot_service import BotService
+from src.core.logger import logger
 
 router = Router(name="start_router")
 
 
 @router.message(Command("start"))
-async def start_cmd(message: Message):
-    today = datetime.now().date()
-    max_date = today + timedelta(weeks=settings.WEEKS_TOTAL)
-    start_text = (
-        f"<b>🗓Привет!\n Я бот, который показывает расписание {settings.GROUP_NAME} \n\n</b>"
-        "<blockquote>"
-        "Чтобы получить расписание на нужный день, введи:\n"
-        " <code>/расписание ДД.ММ.ГГГГ</code>\n"
-        " Или просто:\n <code>расписание ДД.ММ.ГГГГ</code>\n\n"
-        "</blockquote>"
-        "<b>Пример: <i>расписание 07.04.2025</i></b>\n\n"
-        "<b><u>ВАЖНО‼️\n</u></b>"
-        "<blockquote>"
-        f"-Введенная дата должна быть не раньше сегодняшнего дня ({today})!\n"
-        f"-Введенная дата должна быть до {max_date.strftime('%d.%m.%Y')}!"
-        "</blockquote>"
-    )
+async def start_cmd(message: Message, service: BotService):
+    try:
+        chat_id = message.from_user.id
+        await service.add_new_chat(chat_id)
+    except Exception as e:
+        logger.error(f"Error in chat with id:{chat_id} while /start command: {e}")
+
+    start_text = await service.get_start_text()
     await message.answer(start_text)

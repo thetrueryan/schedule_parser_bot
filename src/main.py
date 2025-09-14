@@ -6,7 +6,7 @@ from src.core.logger import logger
 
 
 async def main():
-    asyncio.create_task(start_parser_loop())
+    # asyncio.create_task(start_parser_loop())
     await dp.start_polling(bot)
 
 
