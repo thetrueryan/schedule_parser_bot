@@ -71,6 +71,8 @@ class BotService:
         )
         return status
 
-    async def get_chats_by_notification_status(self, status: bool = True) -> list[Optional[ChatsOrm]]:
+    async def get_chats_by_notification_status(
+        self, status: bool = True
+    ) -> list[Optional[ChatsOrm]]:
         chat_list = await self.chats_repo.get_chats_by_status(status=status)
         return chat_list

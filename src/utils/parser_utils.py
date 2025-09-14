@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from src.core.settings import settings
 
+
 def get_day_ids(days_ahead: int = settings.WEEKS_TOTAL * 7):
     today = datetime.today()
     days = []

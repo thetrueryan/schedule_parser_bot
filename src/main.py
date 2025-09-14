@@ -8,11 +8,11 @@ from src.core.logger import logger
 
 async def main():
     polling_task = asyncio.create_task(dp.start_polling(bot))
-    await asyncio.sleep(2)  
-    
+    await asyncio.sleep(2)
+
     asyncio.create_task(start_parser_loop())
     asyncio.create_task(start_notification_loop(bot))
-    
+
     await polling_task
 
 
