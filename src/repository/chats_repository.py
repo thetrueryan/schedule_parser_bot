@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, update
+from sqlalchemy import insert, update, select
 from sqlalchemy.exc import IntegrityError
 
 from src.models.sqlmodels import ChatsOrm
@@ -17,7 +17,12 @@ class ChatsRepository:
             await self.session.commit()
             return True
         except IntegrityError:
-            return False
+            await self.session.rollback()
+            return True
+        except Exception as e:
+            logger.error(f"Error while add chat: {e}")
+            await self.session.rollback()
+        return False
 
     async def update_notification_status(self, chat_id: int, status: bool) -> bool:
         try:
@@ -30,3 +35,8 @@ class ChatsRepository:
         except Exception as e:
             logger.error(f"Error while update chat notification status: {e}")
             return False
+
+    async def get_chats_by_status(self, status: bool) -> list:
+        stmt = select(ChatsOrm).where(ChatsOrm.notification_status == status)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

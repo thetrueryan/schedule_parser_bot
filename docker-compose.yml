@@ -1,7 +1,36 @@
 services:
+  bot:
+    image: schedule_bot:0.5.1
+    container_name: schedule_bot
+    volumes:
+      - app_logs:/schedule_parser/logs/
+    depends_on:
+      - db
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+
+      WEEKS_TOTAL: ${WEEKS_TOTAL}
+      GROUP_NAME: ${GROUP_NAME}
+      NOTIFICATION_TIME_HOUR: ${NOTIFICATION_TIME_HOUR}
+      NOTIFICATION_TIME_MINUTES: ${NOTIFICATION_TIME_MINUTES}
+
+      DNEVNIK_URL: ${DNEVNIK_URL}
+      DNEVNIK_LOGIN: ${DNEVNIK_LOGIN}
+      DNEVNIK_PASS: ${DNEVNIK_PASS}
+
+      DB_HOST: ${DB_HOST}
+      DB_PASS: ${DB_PASS}
+      DB_USER: ${DB_USER}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+    restart: unless-stopped
+    networks:
+      - schedule_network
   db:
     image: postgres:15-alpine
     container_name: schedule_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     environment:
@@ -9,3 +38,13 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     restart: unless-stopped
+    networks:
+      - schedule_network
+
+volumes:
+  app_logs:
+  postgres_data:
+
+networks:
+  schedule_network:
+    driver: bridge

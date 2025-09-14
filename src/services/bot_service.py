@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 from src.repository.schedule_repository import ScheduleRepository
 from src.repository.chats_repository import ChatsRepository
+from src.models.sqlmodels import ChatsOrm
 from src.core.exc import DateValidateException
 from src.utils.bot_utils import fill_lessons_on_bot_response
 from src.core.settings import settings
@@ -32,13 +34,12 @@ class BotService:
         except Exception:
             raise
 
-    async def create_schedule_response(self, schedule: list, date: str):
-        response = f"<b><u>📅 Расписание на {date}:</u></b>\n\n"
+    async def create_schedule_response(self, schedule: list, date: datetime):
+        response = f"<b><u>📅 Расписание на {date.strftime("%d.%m.%Y")}:</u></b>\n\n"
 
         if not schedule:
             response += "<blockquote><b>#1\n 🤩 ВЫХОДНОЙ </b></blockquote>"
             return response
-        print(response)
         response = fill_lessons_on_bot_response(response=response, schedule=schedule)
         return response
 
@@ -69,3 +70,7 @@ class BotService:
             chat_id=chat_id, status=status
         )
         return status
+
+    async def get_chats_by_notification_status(self, status: bool = True) -> list[Optional[ChatsOrm]]:
+        chat_list = await self.chats_repo.get_chats_by_status(status=status)
+        return chat_list

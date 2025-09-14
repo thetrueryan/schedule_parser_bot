@@ -37,7 +37,7 @@ async def add_chat_id(message: Message, service: BotService):
         if not status:
             raise
         await message.answer(
-            f"✅Чат успешно добавлен в ежедневную рассылку в {settings.NOTIFICATION_TIME}:00!"
+            f"✅Чат успешно добавлен в ежедневную рассылку в {settings.NOTIFICATION_TIME_HOUR}:{settings.NOTIFICATION_TIME_MINUTES}!"
         )
         logger.info(f"Chat with id: {chat_id} subscribe to notifications successfully")
     except Exception as e:
@@ -55,7 +55,7 @@ async def add_chat_id(message: Message, service: BotService):
         if not status:
             raise
         await message.answer(
-            f"✅Чат успешно удален из ежедневной рассылки в {settings.NOTIFICATION_TIME}:00!"
+            f"✅Чат успешно удален из ежедневной рассылки в {settings.NOTIFICATION_TIME_HOUR}:{settings.NOTIFICATION_TIME_MINUTES}!"
         )
         logger.info(f"Chat with id: {chat_id} subscribe to notifications successfully")
     except Exception as e:
