@@ -54,7 +54,3 @@ htmlcov/
 #env
 .env
 .environment
-
-#Chrome driver
-chromedriver
-chromedriver.exe
