@@ -2,7 +2,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from selenium.webdriver.chrome.options import Options
-from seleniumwire import webdriver
+from seleniumwire import webdriver  # type: ignore[import-untyped]
 from fake_useragent import UserAgent
 
 from src.core.settings import settings

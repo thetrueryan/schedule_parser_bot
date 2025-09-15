@@ -24,6 +24,7 @@ alembic = "^1.16.5"
 mypy = "^1.18.1"
 asyncpg = "^0.30.0"
 psycopg2-binary = "^2.9.10"
+pytest = "^8.4.2"
 
 
 [build-system]

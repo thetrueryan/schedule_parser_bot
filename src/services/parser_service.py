@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from seleniumwire import webdriver
+from seleniumwire import webdriver  # type: ignore[import-untyped]
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 

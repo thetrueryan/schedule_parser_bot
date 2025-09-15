@@ -36,7 +36,7 @@ class ChatsRepository:
             logger.error(f"Error while update chat notification status: {e}")
             return False
 
-    async def get_chats_by_status(self, status: bool) -> list:
+    async def get_chats_by_status(self, status: bool):
         stmt = select(ChatsOrm).where(ChatsOrm.notification_status == status)
         result = await self.session.execute(stmt)
         return result.scalars().all()

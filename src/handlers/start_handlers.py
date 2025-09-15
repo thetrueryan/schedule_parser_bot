@@ -11,8 +11,9 @@ router = Router(name="start_router")
 @router.message(Command("start"))
 async def start_cmd(message: Message, service: BotService):
     try:
-        chat_id = message.from_user.id
-        await service.add_new_chat(chat_id)
+        if message.from_user:
+            chat_id = message.from_user.id
+            await service.add_new_chat(chat_id)
     except Exception as e:
         logger.error(f"Error in chat with id:{chat_id} while /start command: {e}")
 

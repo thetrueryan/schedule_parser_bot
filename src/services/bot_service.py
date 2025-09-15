@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
+from aiogram.types import Message
 
 from src.repository.schedule_repository import ScheduleRepository
 from src.repository.chats_repository import ChatsRepository
@@ -14,19 +15,21 @@ class BotService:
         self.schedule_repo = schedule_repo
         self.chats_repo = chats_repo
 
-    async def get_date_from_message(self, message: str) -> datetime:
+    async def get_date_from_message(self, message: Message) -> datetime:
+        if not message.text:
+            raise DateValidateException
+
         parts = message.text.split()
         if len(parts) != 2:
             raise DateValidateException
 
         date = parts[1]
         try:
-            date = datetime.strptime(date, "%d.%m.%Y")
-            return date
+            return datetime.strptime(date, "%d.%m.%Y")
         except ValueError:
             raise DateValidateException
 
-    async def get_schedule(self, date: datetime) -> list | None:
+    async def get_schedule(self, date: datetime) -> list:
         try:
             format_date = date.strftime("%Y%m%d")
             schedule = await self.schedule_repo.get_schedule_by_date(format_date)
@@ -73,6 +76,6 @@ class BotService:
 
     async def get_chats_by_notification_status(
         self, status: bool = True
-    ) -> list[Optional[ChatsOrm]]:
+    ) -> list[ChatsOrm]:
         chat_list = await self.chats_repo.get_chats_by_status(status=status)
         return chat_list

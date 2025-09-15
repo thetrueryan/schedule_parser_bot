@@ -7,6 +7,7 @@ from src.utils.bot_utils import get_seconds_to_target
 from src.utils.sql_utils import get_chats_repo, get_schedule_repo
 from src.services.bot_service import BotService
 from src.core.logger import logger
+from src.core.exc import NotificationNotFoundError
 
 
 async def start_notification_loop(
@@ -28,16 +29,16 @@ async def start_notification_loop(
             schedule_repo = await get_schedule_repo()
             chats_repo = await get_chats_repo()
             service = BotService(schedule_repo=schedule_repo, chats_repo=chats_repo)
+            notificated_date = datetime.today() + timedelta(days=1)
             notificated_chats = await service.get_chats_by_notification_status(
                 status=True
             )
-            if not notificated_chats:
-                logger.info(
-                    f"No chats to send notification. sleep for {notificate_cycle_sleep_time} seconds.."
-                )
-                await asyncio.sleep(notificate_cycle_sleep_time)
-            notificated_date = datetime.today() + timedelta(days=1)
             schedule = await service.get_schedule(notificated_date)
+            if not notificated_chats:
+                raise NotificationNotFoundError("No chats to send notification.")
+
+            if not schedule:
+                raise NotificationNotFoundError("No schedule to send notification.")
             response = await service.create_schedule_response(
                 schedule=schedule, date=notificated_date
             )
@@ -48,6 +49,9 @@ async def start_notification_loop(
             logger.info(
                 f"Notification cycle ended successfully, sleep for {notificate_cycle_sleep_time} seconds.."
             )
+            await asyncio.sleep(notificate_cycle_sleep_time)
+        except NotificationNotFoundError as e:
+            logger.warning(f"{e} sleep for {notificate_cycle_sleep_time} seconds..")
             await asyncio.sleep(notificate_cycle_sleep_time)
         except Exception as e:
             logger.error(f"Error in notification cycle: {e}")

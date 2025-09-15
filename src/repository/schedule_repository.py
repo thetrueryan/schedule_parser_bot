@@ -25,7 +25,7 @@ class ScheduleRepository:
             await self.session.rollback()
             return False
 
-    async def get_schedule_by_date(self, date: str) -> list:
+    async def get_schedule_by_date(self, date: str):
         stmt = select(ScheduleOrm).where(ScheduleOrm.date == date)
         result = await self.session.execute(stmt)
         return result.scalars().all()

@@ -1,6 +1,6 @@
 services:
   bot:
-    image: schedule_bot:0.5.1
+    image: thetrueryan/schedule_parser_bot:1.0
     container_name: schedule_bot
     volumes:
       - app_logs:/schedule_parser/logs/

@@ -23,10 +23,10 @@ class Settings(BaseSettings):
     DB_PORT: int | None = None
 
     # customization
-    GROUP_NAME: str | None = ""
-    WEEKS_TOTAL: int | None = 4
-    NOTIFICATION_TIME_HOUR: int | None = 14
-    NOTIFICATION_TIME_MINUTES: int | None = 0
+    GROUP_NAME: str = ""
+    WEEKS_TOTAL: int = 4
+    NOTIFICATION_TIME_HOUR: int = 14
+    NOTIFICATION_TIME_MINUTES: int = 0
 
     @property
     def DB_URL_ASYNC(self):
