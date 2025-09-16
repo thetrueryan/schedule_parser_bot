@@ -19,3 +19,12 @@ async def start_cmd(message: Message, service: BotService):
 
     start_text = await service.get_start_text()
     await message.answer(start_text)
+
+
+@router.message(Command("help"))
+async def help_cmd(message: Message, service: BotService):
+    try:
+        help_text = await service.get_help_text()
+        await message.answer(help_text)
+    except Exception as e:
+        logger.error(f"Error in /help command: {e}")
