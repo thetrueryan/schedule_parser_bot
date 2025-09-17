@@ -36,24 +36,28 @@ build_job:
     - docker push $DOCKER_IMAGE:latest
 
 deploy_job:
-    stage: deploy
-    tags:
-        - deploy
-    image: ubuntu:22.04
-    before_script:
-        - apt-get update && apt-get install -y openssh-client
-        - mkdir -p ~/.ssh
-        - chmod 700 ~/.ssh
-    script:
-        - echo "$SSH_PRIVATE_KEY" > ~/.ssh/key.pem
-        - chmod 600 ~/.ssh/key.pem
-        - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
-        - chmod 644 ~/.ssh/known_hosts
-        - scp -i ~/.ssh/key.pem -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
-        - |
-          ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && cat > .env" << 'EOF'
-          $DOCKER_COMPOSE_ENV
-          EOF
-        - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASS' $CI_REGISTRY"
-        - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose down"
-        - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose up -d"
+  stage: deploy
+  tags:
+    - deploy
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update && apt-get install -y openssh-client
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/key.pem
+    - chmod 600 ~/.ssh/key.pem
+    - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    # Копируем docker-compose.yml
+    - scp -i ~/.ssh/key.pem -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
+
+    # Записываем .env прямо с переменной
+    - |
+      ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cat > ~/schedule_bot/.env" <<< "$DOCKER_COMPOSE_ENV"
+
+    # Дальше команды одна за другой
+    - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASS' $CI_REGISTRY"
+    - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose down"
+    - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose up -d"
+
