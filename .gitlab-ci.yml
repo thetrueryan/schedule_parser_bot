@@ -14,21 +14,46 @@ lint_job:
         - mypy .
 
 build_job:
-    stage: build
+  stage: build
+  tags:
+    - build
+  image: docker:20.10
+  services:
+    - name: docker:20.10-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_IMAGE: registry.gitlab.com/thetrueryan/shedule_parser
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_BUILDKIT: "1"  
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $DOCKER_IMAGE:latest || true
+    - docker build \
+        --cache-from $DOCKER_IMAGE:latest \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - docker tag $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE:latest
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push $DOCKER_IMAGE:latest
+
+deploy_job:
+    stage: deploy
     tags:
-        - build
-    image: docker:20.10
-    services:
-        - name: docker:20.10-dind
-          alias: docker
-          command: ["--tls=false"]
-    variables:
-        DOCKER_IMAGE: registry.gitlab.com/thetrueryan/shedule_parser
-        DOCKER_HOST: tcp://docker:2375
-        DOCKER_TLS_CERTDIR: ""
+        - deploy
+    image: alpine:latest
+    before_script:
+        - apk add --no-cache openssh-client
+        - mkdir -p ~/.ssh
+        - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        - chmod 600 ~/.ssh/id_rsa
+        - ssh-keyscan -H $SSH_SERVER_IP >> ~/.ssh/known_hosts
     script:
-        - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
-        - docker tag $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE:latest  
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-        - docker push $DOCKER_IMAGE:latest 
+        - scp -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/ 
+        - ssh -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "
+            cd ~/schedule_bot &&
+            echo '$DOCKER_COMPOSE_ENV' > .env &&
+            docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASS' $CI_REGISTRY &&
+            docker compose down && docker compose up -d
+            "
