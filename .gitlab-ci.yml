@@ -44,9 +44,8 @@ deploy_job:
         - apt-get update && apt-get install -y openssh-client docker.io
         - mkdir -p ~/.ssh
         - chmod 700 ~/.ssh
-        - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        - printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         - chmod 600 ~/.ssh/id_rsa
-        - cat ~/.ssh/id_rsa
         - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
         - chmod 644 ~/.ssh/known_hosts
     script:
