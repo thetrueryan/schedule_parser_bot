@@ -39,15 +39,16 @@ deploy_job:
     stage: deploy
     tags:
         - deploy
-    image: alpine:latest
+    image: ubuntu:24.04  
     before_script:
-        - apk add --no-cache openssh-client
+        - apt-get update && apt-get install -y openssh-client
         - mkdir -p ~/.ssh
-        - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_rsa
+        - chmod 700 ~/.ssh
+        - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         - chmod 600 ~/.ssh/id_rsa
-        - ssh-keyscan -H $SSH_SERVER_IP >> ~/.ssh/known_hosts
+        - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
     script:
-        - scp -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/ 
+        - scp -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
         - ssh -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "
             cd ~/schedule_bot &&
             echo '$DOCKER_COMPOSE_ENV' > .env &&
