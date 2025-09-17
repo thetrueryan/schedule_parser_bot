@@ -43,7 +43,7 @@ deploy_job:
     before_script:
         - apk add --no-cache openssh-client
         - mkdir -p ~/.ssh
-        - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
         - chmod 600 ~/.ssh/id_rsa
         - ssh-keyscan -H $SSH_SERVER_IP >> ~/.ssh/known_hosts
     script:
