@@ -38,7 +38,7 @@ build/
 
 # Pytest
 .pytest_cache/
-tests
+tests/
 
 # Coverage
 .coverage
