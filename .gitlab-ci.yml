@@ -36,23 +36,24 @@ build_job:
     - docker push $DOCKER_IMAGE:latest
 
 deploy_job:
-  stage: deploy
-  tags:
-    - deploy
-  image: docker:20.10-git
-  variables:
-    DOCKER_HOST: "ssh://${SSH_SERVER_USER}@${SSH_SERVER_IP}"
-  before_script:
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - apk add --no-cache openssh-client
-    - eval $(ssh-agent -s)
-    - echo "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - scp ./docker-compose.yml ${SSH_SERVER_USER}@${SSH_SERVER_IP}:~/schedule_bot/
-    - ssh ${SSH_SERVER_USER}@${SSH_SERVER_IP} "cd ~/schedule_bot && echo '$DOCKER_COMPOSE_ENV' > .env"
-    - docker compose -f ~/schedule_bot/docker-compose.yml down
-    - docker compose -f ~/schedule_bot/docker-compose.yml up -d --buildr compose down && docker compose up -d
+    stage: deploy
+    tags:
+        - deploy
+    image: ubuntu:22.04
+    before_script:
+        - apt-get update && apt-get install -y openssh-client docker.io
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        - chmod 600 ~/.ssh/id_rsa
+        - cat ~/.ssh/id_rsa
+        - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
+        - chmod 644 ~/.ssh/known_hosts
+    script:
+        - scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -v ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
+        - ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -v $SSH_SERVER_USER@$SSH_SERVER_IP "
+            cd ~/schedule_bot &&
+            echo '$DOCKER_COMPOSE_ENV' > .env &&
+            docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASS' $CI_REGISTRY &&
+            docker compose down && docker compose up -d
             "
