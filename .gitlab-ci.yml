@@ -47,6 +47,7 @@ deploy_job:
     script:
         - echo "$SSH_PRIVATE_KEY" > ~/.ssh/key.pem
         - chmod 600 ~/.ssh/key.pem
+        - cat -A ~/.ssh/key.pem
         - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
         - chmod 644 ~/.ssh/known_hosts
         
