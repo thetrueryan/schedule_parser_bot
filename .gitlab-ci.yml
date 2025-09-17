@@ -47,15 +47,13 @@ deploy_job:
     script:
         - echo "$SSH_PRIVATE_KEY" > ~/.ssh/key.pem
         - chmod 600 ~/.ssh/key.pem
-        - cat -A ~/.ssh/key.pem
         - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
         - chmod 644 ~/.ssh/known_hosts
-        
-        # Копирование файла
         - scp -i ~/.ssh/key.pem -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
-        
-        # Разделяем команды на отдельные вызовы ssh
-        - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && echo '$DOCKER_COMPOSE_ENV' > .env"
+        - |
+          ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && cat > .env" << 'EOF'
+          $DOCKER_COMPOSE_ENV
+          EOF
         - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASS' $CI_REGISTRY"
         - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose down"
         - ssh -i ~/.ssh/key.pem -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose up -d"
