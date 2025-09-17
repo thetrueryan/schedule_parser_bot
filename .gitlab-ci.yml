@@ -9,7 +9,7 @@ lint_job:
         - test
     image: python:3.12.3-slim
     script:
-        - pip -r requirements.txt
+        - pip install -r requirements.txt
         - black --check .
         - mypy .
 
