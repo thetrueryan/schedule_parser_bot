@@ -50,6 +50,6 @@ deploy_job:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - scp -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
-    - ssh -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASS $CI_REGISTRY && docker compose down && docker compose up -d"
+    - ssh -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose down && docker compose up -d"
 
 
