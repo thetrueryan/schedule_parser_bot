@@ -23,7 +23,7 @@ build_job:
       alias: docker
       command: ["--tls=false"]
   variables:
-    DOCKER_IMAGE: registry.gitlab.com/thetrueryan-group/shedule_parser
+    DOCKER_IMAGE: registry.gitlab.com/thetrueryan/shedule_parser
     DOCKER_HOST: tcp://docker:2375  
     DOCKER_TLS_CERTDIR: ""          
   script:
