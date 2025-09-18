@@ -23,17 +23,16 @@ build_job:
       alias: docker
       command: ["--tls=false"]
   variables:
-    DOCKER_IMAGE: registry.gitlab.com/thetrueryan/shedule_parser
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_BUILDKIT: "1"
+    DOCKER_IMAGE: registry.gitlab.com/thetrueryan-group/shedule_parser
+    DOCKER_HOST: tcp://docker:2375  
+    DOCKER_TLS_CERTDIR: ""          
   script:
+    - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - docker tag $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE:latest  
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $DOCKER_IMAGE:latest || true
-    - docker build --cache-from $DOCKER_IMAGE:latest --build-arg BUILDKIT_INLINE_CACHE=1 -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
-    - docker tag $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA $DOCKER_IMAGE:latest
     - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-    - docker push $DOCKER_IMAGE:latest
+    - docker push $DOCKER_IMAGE:latest 
+
 
 deploy_job:
   stage: deploy
