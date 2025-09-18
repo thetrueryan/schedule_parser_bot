@@ -49,8 +49,6 @@ deploy_job:
     - ssh-keyscan -H $SSH_SERVER_IP > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - echo "SSH_SERVER_USER=$SSH_SERVER_USER"
-    - echo "SSH_SERVER_IP=$SSH_SERVER_IP"
     - scp -o StrictHostKeyChecking=no ./docker-compose.yml $SSH_SERVER_USER@$SSH_SERVER_IP:~/schedule_bot/
     - ssh -o StrictHostKeyChecking=no $SSH_SERVER_USER@$SSH_SERVER_IP "cd ~/schedule_bot && docker compose down && docker compose up -d"
 
