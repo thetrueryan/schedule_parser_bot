@@ -1,6 +1,6 @@
 services:
   bot:
-    image: registry.gitlab.com/thetrueryan/shedule_parser:latest
+    image: thetrueryan/schedule_parser_bot:latest
     container_name: schedule_bot
     volumes:
       - app_logs:/schedule_parser/logs/
