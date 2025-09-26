@@ -5,13 +5,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
 from src.repository.schedule_repository import ScheduleRepository
-from src.core.config import driver
 from src.core.logger import logger
 from src.core.settings import settings
 
 
 class ParserService:
-    def __init__(self, repo: ScheduleRepository, driver: webdriver.Chrome = driver):
+    def __init__(self, repo: ScheduleRepository, driver: webdriver.Chrome):
         self.driver = driver
         self.repo = repo
 
